@@ -1,8 +1,10 @@
 package me.cousinss;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 public class ResourceSet {
@@ -68,7 +70,7 @@ public class ResourceSet {
      */
     public boolean contains(ResourceSet resourceSet) {
         for(Resource r : resources.keySet()) {
-            if(!resourceSet.contains(r, this.count(r))) {
+            if(!this.contains(r, resourceSet.count(r))) {
                 return false;
             }
         }
@@ -114,7 +116,20 @@ public class ResourceSet {
         return false;
     }
 
+    public ResourceSet remove(ResourceSet resourceSet) {
+        resourceSet.resources.forEach(this::remove);
+        return this;
+    }
+
     public boolean isEmpty() {
         return this.size() == 0;
+    }
+
+    public String toString() {
+        List<String> out = new ArrayList<>();
+        for(Resource r : Resource.values()) {
+            out.add(r + ": " + resources.get(r));
+        }
+        return "{" + String.join(", ", out) + "}";
     }
 }

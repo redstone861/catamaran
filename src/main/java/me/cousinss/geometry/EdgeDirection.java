@@ -1,8 +1,7 @@
 package me.cousinss.geometry;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public enum EdgeDirection implements HexDirection<EdgeDirection> {
     UPRIGHT(1, -1, true),
@@ -14,6 +13,7 @@ public enum EdgeDirection implements HexDirection<EdgeDirection> {
 
     private final boolean dominant;
     private final TileCoordinate coordinateVector;
+    static final Map<EdgeDirection, Set<VertexDirection>> ADJACENT_VERTICES;
     private static final Map<EdgeDirection, EdgeCoordinate> DOMINANT_ADJUST;
 
     EdgeDirection(final int q, final int r, boolean dominant) {
@@ -23,12 +23,15 @@ public enum EdgeDirection implements HexDirection<EdgeDirection> {
 
     static {
         Map<EdgeDirection, EdgeCoordinate> map = new HashMap<>();
+        Map<EdgeDirection, Set<VertexDirection>> vertices = new HashMap<>();
         for(EdgeDirection d : EdgeDirection.values()) {
             map.put(d, new EdgeCoordinate(
                     d.dominant ? TileCoordinate.origin()    : new TileCoordinate(d.coordinateVector.q(), d.coordinateVector.r()),
                     d.dominant ? d                          : d.getOpposing()));
+            vertices.put(d, EnumSet.of(VertexDirection.values()[d.ordinal()], VertexDirection.values()[d.ordinal() + 1 == 6 ? 0 : d.ordinal() + 1]));
         }
         DOMINANT_ADJUST = Collections.unmodifiableMap(map);
+        ADJACENT_VERTICES = Collections.unmodifiableMap(vertices);
     }
 
     public TileCoordinate getCoordinateVector() {
@@ -51,5 +54,9 @@ public enum EdgeDirection implements HexDirection<EdgeDirection> {
 
     public HexCoordinate<EdgeDirection> getDominantAdjust() {
         return DOMINANT_ADJUST.get(this);
+    }
+
+    public Set<VertexDirection> getAdjacentVertices() {
+        return ADJACENT_VERTICES.get(this);
     }
 }
